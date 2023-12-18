@@ -13,7 +13,7 @@ import java.util.Vector;
 /**
  * 绘图面板
  */
-public class GamePanel extends JPanel implements KeyListener {
+public class GamePanel extends JPanel implements KeyListener, Runnable {
     private Hero hero = null;
 
     private Vector<Enemy> enemies = new Vector<>();
@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements KeyListener {
         hero.setSpeed(5);
 
         for (int i = 0; i < 3; i++) {
-            Enemy enemy = new Enemy(100*(i+1),0);
+            Enemy enemy = new Enemy(100 * (i + 1), 0);
             enemy.setDir(2);
             enemies.add(enemy);
         }
@@ -37,6 +37,11 @@ public class GamePanel extends JPanel implements KeyListener {
         paintTank(hero.getX(), hero.getY(), g, hero.getDir(), 0);
         for (Enemy enemy : enemies) {
             paintTank(enemy.getX(), enemy.getY(), g, enemy.getDir(), 1);
+        }
+        //绘制主角子弹
+        if (hero.getShot() != null && hero.getShot().isLive()) {
+            g.setColor(Color.yellow);
+            g.draw3DRect(hero.getShot().getX(),hero.getShot().getY(),2,2,false);
         }
     }
 
@@ -114,6 +119,9 @@ public class GamePanel extends JPanel implements KeyListener {
                 hero.setDir(3);
                 hero.move(0, -1);
                 break;
+            case KeyEvent.VK_J:
+                hero.shotEnemyTank();
+                break;
         }
         this.repaint();
     }
@@ -121,5 +129,18 @@ public class GamePanel extends JPanel implements KeyListener {
     @Override
     public void keyReleased(KeyEvent e) {
 
+    }
+
+    @SuppressWarnings("all")
+    @Override
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            repaint();//每隔100ms重新绘制GamePanel
+        }
     }
 }
