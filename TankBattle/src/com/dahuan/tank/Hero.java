@@ -18,6 +18,9 @@ public class Hero extends Tank{
      */
     @SuppressWarnings("all")
     public void shotEnemyTank(){
+        if (!(shot==null||shot.isLive()==false)){
+            return;
+        }
         switch (getDir()){ //根据坦克方向位置给定子弹方向位置
             case 0://向上
                 shot = new Shot(getX()+25,getY(),0);

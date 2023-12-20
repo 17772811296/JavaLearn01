@@ -8,6 +8,7 @@ public class Tank {
     private int y;
     private int speed = 1;
     private int dir = 0;
+    private boolean isLive = true;
 
     public Tank(int x, int y) {
         this.x = x;
@@ -46,16 +47,35 @@ public class Tank {
         this.y = y;
     }
 
-    /**
-     * 坦克的移动
-     * @param xOrY 0表示x轴移动 1表示y轴移动
-     * @param dirXorY 轴向正负向移动 -1 or 1
-     */
-    public void move(int xOrY, int dirXorY) {
-        if (xOrY == 0) {
-            x += dirXorY * speed;
-        } else {
-            y += dirXorY * speed;
+    public boolean isLive() {
+        return isLive;
+    }
+
+    public void setLive(boolean live) {
+        isLive = live;
+    }
+
+    public void moveUp() {
+        if (getY() > 0) {
+            y -= speed;
+        }
+    }
+
+    public void moveRight() {
+        if (getX() + 60 < 1000) {
+            x += speed;
+        }
+    }
+
+    public void moveDown() {
+        if (getY() + 60 < 750) {
+            y += speed;
+        }
+    }
+
+    public void moveLeft() {
+        if (getX() > 0) {
+            x -= speed;
         }
     }
 }

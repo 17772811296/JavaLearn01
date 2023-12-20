@@ -9,7 +9,7 @@ public class Shot implements Runnable {
     private int x;
     private int y;
     private int dir;
-    private int speed = 5;
+    private int speed = 1;
     private boolean isLive = true;
 
     public Shot(int x, int y, int dir) {
@@ -81,9 +81,10 @@ public class Shot implements Runnable {
                     x -= speed;
                     break;
             }
-            System.out.println("子弹的x" + x + "子弹的y" + y);
-            if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 750)) {
-                System.out.println("子弹超出边界");
+//            System.out.println("子弹的x" + x + "子弹的y" + y);
+//            System.out.println(this.hashCode());
+            if (!(x >= 0 && x <= 1000 && y >= 0 && y <= 750 && isLive())) {
+//                System.out.println("子弹超出边界");
                 isLive = false;
                 break;
             }

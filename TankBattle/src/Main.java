@@ -1,11 +1,6 @@
 import com.dahuan.draw.DrawFrame;
-import jdk.internal.util.xml.impl.Input;
-
-import java.awt.event.InputEvent;
-
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
+    //程序主要入口
     public static void main(String[] args) {
         new DrawFrame();
     }
