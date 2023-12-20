@@ -13,32 +13,23 @@ import java.util.Vector;
  */
 @SuppressWarnings("all")
 public class GamePanel extends JPanel implements KeyListener, Runnable {
-    private Hero hero = null;
-
-    private Vector<Enemy> enemies = new Vector<>();
-    private Vector<Bomb> bombs = new Vector<>();
     Image image;
     Image image1;
     Image image2;
+    private Hero hero = null;
+    private Vector<Enemy> enemies = new Vector<>();
+    private Vector<Bomb> bombs = new Vector<>();
 
     @SuppressWarnings("all")
     public GamePanel() {
         //初始化主角
-        hero = new Hero(100, 100);
+        hero = new Hero(500, 300);
         hero.setSpeed(5);
         //初始化敌人
         for (int i = 0; i < 3; i++) {
             Enemy enemy = new Enemy(100 * (i + 1), 0);
             enemy.setDir(2);
             new Thread(enemy).start();
-            Shot shot = null;
-            switch (enemy.getDir()) {
-                case 2:
-                    shot = new Shot(enemy.getX() + 25, enemy.getY() + 60, enemy.getDir());
-                    break;
-            }
-            enemy.getShots().add(shot);
-            new Thread(shot).start();
             enemies.add(enemy);
         }
         //加载爆炸效果美术资源
@@ -54,36 +45,40 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
      * @param shot 子弹
      * @param tank 坦克
      */
-    public void hitEnemyTank(Shot shot, Tank tank) {
-        if (!(shot != null && shot.isLive() && tank.isLive())) {
-            return;
-        }
-        switch (tank.getDir()) {
-            case 0:
-            case 2:
-                if (shot.getX() > tank.getX() && shot.getX() < tank.getX() + 45
-                        && shot.getY() > tank.getY() && shot.getY() < tank.getY() + 60) {
-                    shot.setLive(false);
-                    tank.setLive(false);
-                    if (tank instanceof Enemy){
-                        enemies.remove(tank);
+    public void hitTank(Vector<Shot> shots, Tank tank) {
+        for (int i = 0; i < shots.size(); i++) {
+            Shot shot = shots.get(i);
+            if (!(shot != null && shot.isLive() && tank.isLive())) {
+                return;
+            }
+            switch (tank.getDir()) {
+                case 0:
+                case 2:
+                    if (shot.getX() > tank.getX() && shot.getX() < tank.getX() + 45
+                            && shot.getY() > tank.getY() && shot.getY() < tank.getY() + 60) {
+                        shot.setLive(false);
+                        tank.setLive(false);
+                        if (tank instanceof Enemy) {
+                            enemies.remove(tank);
+                        }
+                        bombs.add(new Bomb(tank.getX(), tank.getY(), true));
                     }
-                    bombs.add(new Bomb(tank.getX(),tank.getY(),true));
-                }
-                break;
-            case 1:
-            case 3:
-                if (shot.getX() > tank.getX() && shot.getX() < tank.getX() + 60
-                        && shot.getY() > tank.getY() && shot.getY() < tank.getY() + 45) {
-                    shot.setLive(false);
-                    tank.setLive(false);
-                    if (tank instanceof Enemy){
-                        enemies.remove(tank);
+                    break;
+                case 1:
+                case 3:
+                    if (shot.getX() > tank.getX() && shot.getX() < tank.getX() + 60
+                            && shot.getY() > tank.getY() && shot.getY() < tank.getY() + 45) {
+                        shot.setLive(false);
+                        tank.setLive(false);
+                        if (tank instanceof Enemy) {
+                            enemies.remove(tank);
+                        }
+                        bombs.add(new Bomb(tank.getX(), tank.getY(), true));
                     }
-                    bombs.add(new Bomb(tank.getX(),tank.getY(),true));
-                }
-                break;
+                    break;
+            }
         }
+
     }
 
     //初始化调用、frame大小改变调用、frame重新打开调用、repaint时候调用
@@ -99,34 +94,45 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 for (int i = 0; i < enemy.getShots().size(); i++) {
                     Shot shot = enemy.getShots().get(i);
                     //绘制子弹
-                    if (shot.isLive()) {//子弹存活的时候才进行绘制
-                        g.setColor(Color.yellow);
-                        g.draw3DRect(shot.getX(), shot.getY(), 2, 2, false);
+                    if (!shot.isLive()) {//子弹存活的时候才进行绘制
+                        enemy.getShots().remove(shot);
+                        continue;
                     }
+                    g.setColor(Color.yellow);
+                    g.draw3DRect(shot.getX(), shot.getY(), 2, 2, false);
                 }
             }
         }
         //绘制主角坦克
-        paintTank(hero.getX(), hero.getY(), g, hero.getDir(), 0);
+        if (hero != null && hero.isLive()) {
+            paintTank(hero.getX(), hero.getY(), g, hero.getDir(), 0);
+        }
         //绘制主角子弹
-        if (hero.getShot() != null && hero.getShot().isLive()) {
-            g.setColor(Color.yellow);
-            g.draw3DRect(hero.getShot().getX(), hero.getShot().getY(), 2, 2, false);
+        if (hero.getShots().size() > 0) {
+            for (int i = 0; i < hero.getShots().size(); i++) {
+                Shot shot = hero.getShots().get(i);
+                if (!shot.isLive()) {
+                    hero.getShots().remove(shot);
+                    continue;
+                }
+                g.setColor(Color.yellow);
+                g.draw3DRect(shot.getX(), shot.getY(), 2, 2, false);
+            }
         }
 
         //绘制爆炸效果
         for (int i = 0; i < bombs.size(); i++) {
             Bomb bomb = bombs.get(i);
-            if (!bomb.isLive()){
+            if (!bomb.isLive()) {
                 bombs.remove(i);
                 return;
             }
-            if (bomb.getLife()>9){
-                g.drawImage(image,bomb.getX(),bomb.getY(),60,60,this);
-            } else if (bomb.getLife()>6) {
-                g.drawImage(image1,bomb.getX(),bomb.getY(),60,60,this);
-            }else {
-                g.drawImage(image2,bomb.getX(),bomb.getY(),60,60,this);
+            if (bomb.getLife() > 9) {
+                g.drawImage(image, bomb.getX(), bomb.getY(), 60, 60, this);
+            } else if (bomb.getLife() > 6) {
+                g.drawImage(image1, bomb.getX(), bomb.getY(), 60, 60, this);
+            } else {
+                g.drawImage(image2, bomb.getX(), bomb.getY(), 60, 60, this);
             }
             bomb.lifeDown();
         }
@@ -229,8 +235,13 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             }
             repaint();//每隔100ms重新绘制GamePanel
 
+            //检查主角子弹打中敌方坦克
             for (int i = 0; i < enemies.size(); i++) {
-                hitEnemyTank(hero.getShot(), enemies.get(i));
+                hitTank(hero.getShots(), enemies.get(i));
+            }
+            //检查敌方弹打中主角坦克
+            for (int i = 0; i < enemies.size(); i++) {
+                hitTank(enemies.get(i).getShots(), hero);
             }
         }
     }
