@@ -1,5 +1,9 @@
 package com.dahuan.tank;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
+
 /**
  * 坦克基本类
  */
@@ -77,5 +81,30 @@ public class Tank {
         if (getX() > 0) {
             x -= speed;
         }
+    }
+
+    public ArrayList<Integer> tankRange(Tank tank) {
+        ArrayList<Integer> temp = new ArrayList<>();
+        if (tank == null) {
+            System.out.println("tank is null");
+            return null;
+        }
+        switch (tank.getDir()) {
+            case 0:
+            case 2:
+                temp.add(tank.getX());
+                temp.add(tank.getX() + 50);
+                temp.add(tank.getY());
+                temp.add(tank.getY() + 60);
+                break;
+            case 1:
+            case 3:
+                temp.add(tank.getX());
+                temp.add(tank.getX() + 60);
+                temp.add(tank.getY());
+                temp.add(tank.getY() + 50);
+                break;
+        }
+        return temp;
     }
 }

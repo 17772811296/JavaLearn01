@@ -1,5 +1,6 @@
 package com.dahuan.draw;
 
+import com.dahuan.db.GameSave;
 import com.dahuan.tank.*;
 
 import javax.swing.*;
@@ -28,7 +29,8 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         //初始化敌人
         for (int i = 0; i < 3; i++) {
             Enemy enemy = new Enemy(100 * (i + 1), 0);
-            enemy.setDir(2);
+            enemy.setDir((int) Math.random()*4);
+            enemy.setEnemies(enemies);
             new Thread(enemy).start();
             enemies.add(enemy);
         }
@@ -60,6 +62,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                         tank.setLive(false);
                         if (tank instanceof Enemy) {
                             enemies.remove(tank);
+                            GameSave.addHitEnemyNum();
                         }
                         bombs.add(new Bomb(tank.getX(), tank.getY(), true));
                     }
@@ -72,6 +75,7 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                         tank.setLive(false);
                         if (tank instanceof Enemy) {
                             enemies.remove(tank);
+                            GameSave.addHitEnemyNum();
                         }
                         bombs.add(new Bomb(tank.getX(), tank.getY(), true));
                     }
@@ -136,6 +140,9 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
             }
             bomb.lifeDown();
         }
+
+        //绘制游戏信息
+        painShowInfo(g);
     }
 
     /**
@@ -186,6 +193,20 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
                 g.fillRect(x, y + 23, 30, 5);
                 break;
         }
+    }
+
+    /**
+     * 绘制游戏信息
+     * @param g
+     */
+    public void painShowInfo(Graphics g){
+        g.setColor(Color.black);
+        g.setFont(new Font("楷书",Font.BOLD,18));
+        g.drawString("击毁敌方坦克数量",1020,50);
+        paintTank(1020,80,g,0,1);
+        g.setColor(Color.black);
+        g.setFont(new Font("宋体",Font.BOLD,18));
+        g.drawString(String.valueOf(GameSave.getHeroHitEnemyNum()),1090,120);
     }
 
     @Override
