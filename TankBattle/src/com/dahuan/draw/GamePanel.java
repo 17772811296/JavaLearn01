@@ -21,6 +21,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
     private Vector<Enemy> enemies = new Vector<>();
     private Vector<Bomb> bombs = new Vector<>();
 
+    public void setEnemies(Vector<Enemy> enemies) {
+        this.enemies = enemies;
+    }
+
     @SuppressWarnings("all")
     public GamePanel() {
         //初始化主角
@@ -39,6 +43,10 @@ public class GamePanel extends JPanel implements KeyListener, Runnable {
         image1 = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/bomb_2.gif"));
         image2 = Toolkit.getDefaultToolkit().getImage(Panel.class.getResource("/bomb_3.gif"));
 
+    }
+
+    public Vector<Enemy> getEnemies() {
+        return enemies;
     }
 
     /**
